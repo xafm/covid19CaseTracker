@@ -8,7 +8,7 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint .",
-    "emulator": "cd C:\\Users\\tr19099\\AppData\\Local\\Android\\Sdk\\emulator && emulator @4_WVGA_Nexus_S_API_28_480x800"
+    "emulator": "cd C:\\Users\\faruk\\AppData\\Local\\Android\\Sdk\\emulator && emulator @Nexus_S_API_28"
   },
   "dependencies": {
     "react": "16.9.0",

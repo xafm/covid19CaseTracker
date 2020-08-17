@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet } from "react-native";
+import Formatter from "../../script/formatters";
 
 export default function SinceYourPreviousVisit(props) {
   const getHeaderDates = () => {
@@ -31,15 +32,21 @@ export default function SinceYourPreviousVisit(props) {
 
       <Text style={props.styles.textHeaders}>Confirmed</Text>
       <Text style={props.styles.textRed}>
-        {props.dataSinceYourPreviousVisit.confirmed}
+        {Formatter.numberThousandSeperator(
+          props.dataSinceYourPreviousVisit.confirmed
+        )}
       </Text>
       <Text style={props.styles.textHeaders}>Deaths</Text>
       <Text style={props.styles.textGrey}>
-        {props.dataSinceYourPreviousVisit.deaths}
+        {Formatter.numberThousandSeperator(
+          props.dataSinceYourPreviousVisit.deaths
+        )}
       </Text>
       <Text style={props.styles.textHeaders}>Recovered</Text>
       <Text style={props.styles.textGreen}>
-        {props.dataSinceYourPreviousVisit.recovered}
+        {Formatter.numberThousandSeperator(
+          props.dataSinceYourPreviousVisit.recovered
+        )}
       </Text>
       <Text style={{ ...props.styles.header, fontSize: 10 }}>
         Swipe left to see number of total cases

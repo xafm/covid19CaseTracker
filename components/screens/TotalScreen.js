@@ -1,5 +1,6 @@
 import React from "react";
 import { Text, View, Button, StyleSheet } from "react-native";
+import Formatter from "../../script/formatters";
 
 export default function TotalScreen(props) {
   const formatDate = date => {
@@ -28,14 +29,20 @@ export default function TotalScreen(props) {
         </View>
 
         <Text style={props.styles.textHeaders}>Confirmed</Text>
-        <Text style={props.styles.textRed}>{props.totalData.confirmed}</Text>
+        <Text style={props.styles.textRed}>
+          {Formatter.numberThousandSeperator(props.totalData.confirmed)}
+        </Text>
         <Text style={props.styles.textHeaders}>Deaths</Text>
-        <Text style={props.styles.textGrey}>{props.totalData.deaths}</Text>
+        <Text style={props.styles.textGrey}>
+          {Formatter.numberThousandSeperator(props.totalData.deaths)}
+        </Text>
         <Text style={props.styles.textHeaders}>Recovered</Text>
-        <Text style={props.styles.textGreen}>{props.totalData.recovered}</Text>
+        <Text style={props.styles.textGreen}>
+          {Formatter.numberThousandSeperator(props.totalData.recovered)}
+        </Text>
         <Text style={{ ...props.styles.header, fontSize: 10 }}>
           Swipe right to see number of cases since your last visit
-      </Text>
+        </Text>
       </View>
     </View>
   );
