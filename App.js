@@ -1,15 +1,12 @@
 import React, {useEffect, useContext} from 'react';
 import {ActivityIndicator, StyleSheet, View, Dimensions} from 'react-native';
-import DropdownMessage from './src/components/DropdownMessage';
+import Swiper from 'react-native-swiper';
 import SinceYourPreviousVisit from './src/screens/SinceYourPreviousVisit';
 import TotalScreen from './src/screens/TotalScreen';
-import Swiper from 'react-native-swiper';
-import getLatestCovidData from './src/apis/getLatestCovidData';
+import DropdownMessage from './src/components/DropdownMessage';
+import getLatestCovidData from './src/api/getLatestCovidData';
 import useStorage from './src/hooks/useStorage';
 import {AppContext, AppProvider} from './src/context/AppContext';
-
-console.log(AppContext);
-console.log(AppProvider);
 
 const windowHeight = Dimensions.get('window').height;
 
@@ -75,7 +72,7 @@ const App = () => {
     if (currentData && !localDataFromPreviousVisit.storedAt) {
       let message =
         "Looks like it's your first time. Data on this screen will be updated next time you visit.";
-      setMessage(message, 'error');
+      setMessage(message, 'info');
     }
 
     setTotalData(currentData);
