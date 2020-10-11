@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useReducer} from 'react';
+import React, {useEffect, useContext} from 'react';
 import {ActivityIndicator, StyleSheet, View, Dimensions} from 'react-native';
 import DropdownMessage from './src/components/DropdownMessage';
 import SinceYourPreviousVisit from './src/screens/SinceYourPreviousVisit';
@@ -6,44 +6,25 @@ import TotalScreen from './src/screens/TotalScreen';
 import Swiper from 'react-native-swiper';
 import getLatestCovidData from './src/apis/getLatestCovidData';
 import useStorage from './src/hooks/useStorage';
+import {AppContext, AppProvider} from './src/context/AppContext';
+
+console.log(AppContext);
+console.log(AppProvider);
 
 const windowHeight = Dimensions.get('window').height;
 
-const reducer = (state, action) => {
-  switch (action.colorToChange) {
-    case 'set_data_since_previous_visit':
-      return {...state, dataSinceYourPreviousVisit: action.payload};
-    default:
-      return state;
-  }
-};
+const App = () => {
+  const [
+    state,
+    setDataSincePreviousVisit,
+    setTotalData,
+    setPreviousVisitTime,
+    setIsLoading,
+    setMessage,
+    setLastUpdateTime,
+    calculateDataSinceYourLastVisit,
+  ] = useContext(AppContext);
 
-export default function App() {
-  const [state, dispatch] = useReducer(reducer, {
-    dataSinceYourPreviousVisit: {
-      confirmed: 0,
-      deaths: 0,
-      recovered: 0,
-    },
-  });
-
-  // const [dataSinceYourPreviousVisit, setDataSinceYourPreviousVisit] = useState({
-  //   confirmed: 0,
-  //   deaths: 0,
-  //   recovered: 0,
-  // });
-  const [totalData, setTotalData] = useState({
-    confirmed: 0,
-    deaths: 0,
-    recovered: 0,
-  });
-  const [previousVisitTime, setPreviousVisitTime] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [message, setMessage] = useState({
-    text: '',
-    type: '',
-  });
-  const [lastUpdateTime, setLastUpdate] = useState('');
   const [
     retrieveLocalDataFromPreviousVisit,
     storeLatestDataToLocal,
@@ -54,37 +35,30 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!message.text) {
+    if (!state.message.text) {
       return;
     }
-    DropdownMessage.alert(message.text, message.type);
-  }, [message]);
+    DropdownMessage.alert(state.message.text, state.message.type);
+  }, [state.message]);
 
   const initiate = async () => {
     let localDataFromPreviousVisit = null;
     try {
       localDataFromPreviousVisit = await retrieveLocalDataFromPreviousVisit();
     } catch (error) {
-      setMessage({
-        text: error.message,
-        type: 'error',
-      });
+      setMessage(error.message, 'error');
     }
 
     let currentData = null;
     try {
       currentData = await getLatestCovidData();
-      console.log(currentData);
     } catch (error) {
-      setMessage({
-        text: error.message,
-        type: 'error',
-      });
+      setMessage(error.message, 'error');
     }
 
     if (!currentData) {
       if (localDataFromPreviousVisit.storedAt) {
-        setLastUpdate(localDataFromPreviousVisit.storedAt);
+        setLastUpdateTime(localDataFromPreviousVisit.storedAt);
         setPreviousVisitTime(localDataFromPreviousVisit.storedAt);
         setTotalData(localDataFromPreviousVisit);
       }
@@ -99,50 +73,19 @@ export default function App() {
     );
 
     if (currentData && !localDataFromPreviousVisit.storedAt) {
-      setMessage({
-        text:
-          "Looks like it's your first time. Data on this screen will be updated next time you visit.",
-        type: 'info',
-      });
+      let message =
+        "Looks like it's your first time. Data on this screen will be updated next time you visit.";
+      setMessage(message, 'error');
     }
 
     setTotalData(currentData);
     storeLatestDataToLocal(currentData);
-    // setDataSinceYourPreviousVisit(dataSinceYourLastVisit);
-    dispatch({
-      type: 'set_data_since_previous_visit',
-      payload: dataSinceYourPreviousVisit,
-    });
-    setLastUpdate(new Date());
+    setDataSincePreviousVisit(dataSinceYourPreviousVisit);
+    setLastUpdateTime(new Date());
     setIsLoading(false);
     if (localDataFromPreviousVisit.storedAt) {
       setPreviousVisitTime(localDataFromPreviousVisit.storedAt);
     }
-  };
-
-  const calculateDataSinceYourLastVisit = (
-    latestData,
-    localDataFromPreviousVisit,
-  ) => {
-    if (Object.entries(localDataFromPreviousVisit).length === 0) {
-      return {
-        confirmed: 0,
-        deaths: 0,
-        recovered: 0,
-      };
-    }
-
-    let calculatedData = {
-      confirmed: latestData.confirmed - localDataFromPreviousVisit.confirmed,
-      deaths: latestData.deaths - localDataFromPreviousVisit.deaths,
-      recovered: latestData.recovered - localDataFromPreviousVisit.recovered,
-    };
-
-    return {
-      confirmed: calculatedData.confirmed < 0 ? 0 : calculatedData.confirmed,
-      deaths: calculatedData.deaths < 0 ? 0 : calculatedData.deaths,
-      recovered: calculatedData.recovered < 0 ? 0 : calculatedData.recovered,
-    };
   };
 
   return (
@@ -151,10 +94,10 @@ export default function App() {
         <View style={styles.container}>
           <SinceYourPreviousVisit
             dataSinceYourPreviousVisit={state.dataSinceYourPreviousVisit}
-            previousVisitTime={previousVisitTime}
+            previousVisitTime={state.previousVisitTime}
             styles={styles}
           />
-          {isLoading && (
+          {state.isLoading && (
             <ActivityIndicator
               color={'#fff'}
               size={70}
@@ -165,8 +108,8 @@ export default function App() {
 
         <View style={styles.container}>
           <TotalScreen
-            totalData={totalData}
-            lastUpdateTime={lastUpdateTime}
+            totalData={state.totalData}
+            lastUpdateTime={state.lastUpdateTime}
             styles={styles}
           />
         </View>
@@ -174,7 +117,15 @@ export default function App() {
       <DropdownMessage />
     </View>
   );
-}
+};
+
+export default () => {
+  return (
+    <AppProvider>
+      <App />
+    </AppProvider>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
