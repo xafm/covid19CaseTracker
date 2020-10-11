@@ -14,10 +14,6 @@ export default () => {
       return storeObject;
     } catch (error) {
       throw new Error('Error while retrieving your previous data');
-      // setMessage({
-      //   text: 'Error while retrieving your previous data',
-      //   type: 'error',
-      // });
     }
   };
 

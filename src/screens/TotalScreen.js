@@ -14,7 +14,6 @@ export default function TotalScreen(props) {
         date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
       return `Last update: ${date.getDate()}.${month}.${date.getFullYear()} ${date.getHours()}:${minute}`;
     }
-
     return '-';
   };
 
